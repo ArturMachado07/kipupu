@@ -1,0 +1,186 @@
+// KIPUPU — schema de base de dados
+// Modelado a partir de docs/product/fluxos-utilizacao.md (tabela "Estrutura de dados envolvida")
+//
+// Postgres (Vercel Postgres / Neon). `url` usa a ligação com connection
+// pooling (para os pedidos normais da app) e `directUrl` usa a ligação direta
+// (necessária para `prisma migrate`). A Vercel injeta estas variáveis
+// automaticamente assim que ligas uma base de dados Postgres ao projeto —
+// ver README para o passo a passo.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+// ---------------------------------------------------------------------------
+// Geografia: Município > Distrito > Estação
+// ---------------------------------------------------------------------------
+
+model Municipio {
+  id        String     @id @default(cuid())
+  nome      String     @unique
+  distritos Distrito[]
+
+  createdAt DateTime @default(now())
+}
+
+model Distrito {
+  id          String    @id @default(cuid())
+  nome        String
+  municipioId String
+  municipio   Municipio @relation(fields: [municipioId], references: [id])
+  estacoes    Estacao[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([municipioId, nome])
+}
+
+model Estacao {
+  id          String   @id @default(cuid())
+  nome        String
+  morada      String
+  distritoId  String
+  distrito    Distrito @relation(fields: [distritoId], references: [id])
+  latitude    Float
+  longitude   Float
+  horario     String // ex.: "Seg–Sáb, 08:00–18:00"
+  telefone    String?
+  capacidade  Int      @default(1) // nº de baias de lavagem simultâneas
+  ativa       Boolean  @default(true)
+
+  subscricoes Subscricao[]
+  lavagens    Lavagem[]
+  operadores  OperadorEstacao[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Operador de estação — conta usada pelo funcionário da estação parceira
+// para aceder ao painel de leitura do QR code (ver /estacao/painel).
+// ---------------------------------------------------------------------------
+
+model OperadorEstacao {
+  id           String  @id @default(cuid())
+  nome         String
+  email        String  @unique
+  passwordHash String
+  estacaoId    String
+  estacao      Estacao @relation(fields: [estacaoId], references: [id])
+  ativo        Boolean @default(true)
+
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Cliente / autenticação
+// ---------------------------------------------------------------------------
+
+model Cliente {
+  id           String   @id @default(cuid())
+  nome         String
+  email        String   @unique
+  passwordHash String
+  whatsapp     String? // formato E.164, ex.: "+244900000000"
+  estadoConta  String   @default("ativa") // ativa | suspensa
+
+  subscricoes Subscricao[]
+  pagamentos  Pagamento[]
+  lavagens    Lavagem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Pacotes / subscrição / pagamento / cartão digital
+// ---------------------------------------------------------------------------
+
+model Pacote {
+  id           String  @id @default(cuid())
+  nome         String  @unique // "Básico" | "Intermédio" | "Premium"
+  slug         String  @unique // "basico" | "intermedio" | "premium"
+  descricao    String
+  precoMensal  Int // em Kwanzas (AOA), valor inteiro
+  lavagensMes  Int // nº de lavagens incluídas por mês (0 = ilimitado dentro de política de uso)
+  beneficios   String // lista separada por "|" (simples, sem tabela extra)
+  ordem        Int     @default(0) // para ordenar básico < intermédio < premium na UI
+
+  subscricoes Subscricao[]
+
+  createdAt DateTime @default(now())
+}
+
+model Subscricao {
+  id          String   @id @default(cuid())
+  clienteId   String
+  cliente     Cliente  @relation(fields: [clienteId], references: [id])
+  pacoteId    String
+  pacote      Pacote   @relation(fields: [pacoteId], references: [id])
+
+  // Estação escolhida no Processo 1 (adesão manual). No Processo 2 pode ficar
+  // nula até o Passo "Localizar Estação" ser concluído.
+  estacaoId   String?
+  estacao     Estacao? @relation(fields: [estacaoId], references: [id])
+
+  // "estacao_unica" = válido só na estação associada | "rede_aberta" = válido em qualquer estação parceira
+  ambitoUso   String   @default("rede_aberta")
+
+  estado         String   @default("pendente") // pendente | ativa | expirada | cancelada
+  dataInicio     DateTime?
+  dataRenovacao  DateTime?
+
+  pagamentos  Pagamento[]
+  cartao      CartaoDigital?
+  lavagens    Lavagem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pagamento {
+  id            String     @id @default(cuid())
+  subscricaoId  String
+  subscricao    Subscricao @relation(fields: [subscricaoId], references: [id])
+  clienteId     String
+  cliente       Cliente    @relation(fields: [clienteId], references: [id])
+
+  metodo        String // "referencia" | "transferencia"
+  valor         Int // em Kwanzas (AOA)
+  estado        String   @default("pendente") // pendente | confirmado | falhado
+  referencia    String? // nº de referência Multicaixa (quando metodo = referencia)
+  faturaPdfPath String? // caminho/URL do PDF gerado
+
+  confirmadoEm  DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+model CartaoDigital {
+  id           String     @id @default(cuid())
+  subscricaoId String     @unique
+  subscricao   Subscricao @relation(fields: [subscricaoId], references: [id])
+  codigo       String     @unique // código único embutido no QR
+  qrDataUrl    String // QR code em base64 (data URL), gerado uma vez e cacheado
+  validade     DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model Lavagem {
+  id           String      @id @default(cuid())
+  clienteId    String
+  cliente      Cliente     @relation(fields: [clienteId], references: [id])
+  estacaoId    String
+  estacao      Estacao     @relation(fields: [estacaoId], references: [id])
+  subscricaoId String
+  subscricao   Subscricao  @relation(fields: [subscricaoId], references: [id])
+
+  dataHora DateTime @default(now())
+}

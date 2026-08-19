@@ -1,0 +1,54 @@
+/* O @import tem de vir antes de qualquer outra regra CSS (incluindo as que o
+   Tailwind expande a partir de @tailwind) — caso contrário o browser ignora-o
+   silenciosamente e o CSS do Leaflet (panes, z-index, posicionamento dos
+   marcadores) nunca chega a carregar, fazendo os pins "desaparecerem". */
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens de marca (espelham /styles/tokens.css na raiz do projeto Kipupu) */
+:root {
+  --font-heading: "Nexa Bold", "Poppins", "Montserrat", system-ui, sans-serif;
+  --font-body: "Nexa Regular", "Poppins", "Montserrat", system-ui, sans-serif;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  color: #333333;
+  background: #f6f6f9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Popup/modal genérico usado nos passos 4, 5 e 6 dos fluxos */
+.kipupu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 58, 93, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.kipupu-modal {
+  background: white;
+  border-radius: 24px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 58, 93, 0.35);
+}
+
+/* Marcador do mapa Leaflet com a cor da marca */
+.kipupu-marker-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 58, 93, 0.4));
+}

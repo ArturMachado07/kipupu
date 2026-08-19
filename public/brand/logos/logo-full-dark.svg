@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Camada_2" data-name="Camada 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 852.28 352.11">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        fill: #003a5d;
+      }
+
+      .cls-4 {
+        fill: #27fff7;
+      }
+
+      .cls-2 {
+        font-family: NexaBold, 'Nexa Bold';
+        font-size: 248.78px;
+      }
+
+      .cls-5 {
+        letter-spacing: 0em;
+      }
+
+      .cls-6 {
+        letter-spacing: 0em;
+      }
+
+      .cls-7 {
+        letter-spacing: -.03em;
+      }
+
+      .cls-8 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-9 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-10 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-11 {
+        letter-spacing: -.03em;
+      }
+
+      .cls-12 {
+        letter-spacing: -.03em;
+      }
+
+      .cls-13 {
+        letter-spacing: -.03em;
+      }
+
+      .cls-14 {
+        letter-spacing: -.01em;
+      }
+
+      .cls-15 {
+        letter-spacing: 0em;
+      }
+
+      .cls-3 {
+        font-family: NexaRegular, NexaRegular;
+        font-size: 44.82px;
+      }
+    </style>
+  </defs>
+  <g id="Camada_1-2" data-name="Camada 1">
+    <g>
+      <path class="cls-4" d="M208.25,118.32c-5.27-35.74-33.75-63.9-69.58-68.54-3.43-.45-6.93-.68-10.48-.68-.12,0-.23,0-.35,0v31.72c26.98,0,48.85,21.87,48.85,48.86,0,12.91-5.01,24.65-13.19,33.39-.73.78-1.49,1.54-2.28,2.27l-33.35,33.36-.03.03v12.76c.12,0,.23,0,.35,0h-.35v32.56l.48.49,22.69-22.69,10.35-10.35,19.91-19.91,7.82-7.82c12.47-14.28,20.02-32.99,20.02-53.46,0-4.07-.3-8.07-.88-11.98"/>
+      <path class="cls-4" d="M152.22,129.68c0-13.46-10.91-24.38-24.38-24.38v48.76c13.46,0,24.38-10.91,24.38-24.38"/>
+      <path class="cls-1" d="M73.52,70.41l-4.88,4.88-32.09,32.09-3.99,3.99v-62.27H0v162.39h32.57v-62.71l3.55,3.54,29.62,29.62h0s11.15,11.15,11.15,11.15l18.4,18.39,9.9,9.9,22.67,22.66v-32.56h0v-12.83l-32.63-32.63c-1.31-1.17-2.56-2.42-3.73-3.73l-32.67-32.67,33.8-33.8c.45-.47.91-.93,1.38-1.38,8.78-8.44,20.71-13.63,33.85-13.63v-31.72c-20.94.09-39.99,8.15-54.32,21.31"/>
+      <path class="cls-1" d="M103.46,129.68c0,13.46,10.92,24.38,24.38,24.38v-48.76c-13.46,0-24.38,10.92-24.38,24.38"/>
+      <text class="cls-2" transform="translate(214.9 211.46)"><tspan class="cls-8" x="0" y="0">i</tspan><tspan class="cls-11" x="51.75" y="0">p</tspan><tspan class="cls-7" x="198.77" y="0">u</tspan><tspan class="cls-12" x="341.57" y="0">p</tspan><tspan x="488.36" y="0">u</tspan></text>
+      <text class="cls-3" transform="translate(52.83 338.84)"><tspan class="cls-13" x="0" y="0">A</tspan><tspan class="cls-5" x="32.67" y="0" xml:space="preserve"> plata</tspan><tspan class="cls-15" x="158.53" y="0">f</tspan><tspan x="175.21" y="0">orma que la</tspan><tspan class="cls-9" x="435.53" y="0">v</tspan><tspan class="cls-6" x="459.73" y="0">a o seu </tspan><tspan class="cls-14" x="625.48" y="0">c</tspan><tspan x="648.16" y="0">ar</tspan><tspan class="cls-10" x="695.89" y="0">r</tspan><tspan class="cls-6" x="714.4" y="0">o</tspan></text>
+    </g>
+  </g>
+</svg>
