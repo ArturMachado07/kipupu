@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "add-estacao": "tsx prisma/add-estacao.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

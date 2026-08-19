@@ -3,13 +3,14 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
 /**
- * Protege duas áreas distintas com sessões separadas:
+ * Protege três áreas distintas com sessões separadas:
  *  - /dashboard, /cartao       -> conta de cliente
  *  - /estacao/painel           -> conta de operador de estação
+ *  - /admin/estacoes           -> conta de administrador KIPUPU
  *
  * Não se usa o wrapper `withAuth` por omissão porque este só suporta uma
  * página de login global — aqui precisamos de redirecionar cada área para o
- * seu próprio login (/login vs /estacao/login).
+ * seu próprio login (/login vs /estacao/login vs /admin/login).
  */
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -19,6 +20,15 @@ export async function middleware(req: NextRequest) {
     if (!token || token.role !== "operador") {
       const url = req.nextUrl.clone();
       url.pathname = "/estacao/login";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/admin")) {
+    if (!token || token.role !== "admin") {
+      const url = req.nextUrl.clone();
+      url.pathname = "/admin/login";
       return NextResponse.redirect(url);
     }
     return NextResponse.next();
@@ -34,5 +44,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/cartao/:path*", "/estacao/painel/:path*"],
+  matcher: ["/dashboard/:path*", "/cartao/:path*", "/estacao/painel/:path*", "/admin/estacoes/:path*"],
 };

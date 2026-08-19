@@ -139,6 +139,20 @@ async function main() {
     },
   });
 
+  // ---------------------------------------------------------------------
+  // Conta de administrador (login do painel /admin/estacoes).
+  // ---------------------------------------------------------------------
+  const adminPasswordHash = await bcrypt.hash("kipupu123", 10);
+  await prisma.admin.upsert({
+    where: { email: "admin@kipupu.ao" },
+    update: {},
+    create: {
+      nome: "Administração KIPUPU",
+      email: "admin@kipupu.ao",
+      passwordHash: adminPasswordHash,
+    },
+  });
+
   console.log("Seed concluído:");
   console.log(`  Município: ${municipio.nome}`);
   console.log(`  Distrito: ${distrito.nome}`);
@@ -147,6 +161,7 @@ async function main() {
   console.log(
     `  Login operador demo -> email: operador@kipupu.ao | password: estacao123 (estação: ${estacoes[0].nome})`
   );
+  console.log(`  Login admin -> email: admin@kipupu.ao | password: kipupu123 (MUDA esta password em produção)`);
 }
 
 main()

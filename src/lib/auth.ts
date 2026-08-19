@@ -67,12 +67,40 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+
+    // Login da equipa KIPUPU (painel /admin — cadastro de estações parceiras).
+    CredentialsProvider({
+      id: "admin",
+      name: "Administrador KIPUPU",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
+
+        const admin = await prisma.admin.findUnique({
+          where: { email: credentials.email.toLowerCase().trim() },
+        });
+        if (!admin || !admin.ativo) return null;
+
+        const senhaValida = await bcrypt.compare(credentials.password, admin.passwordHash);
+        if (!senhaValida) return null;
+
+        return {
+          id: admin.id,
+          name: admin.nome,
+          email: admin.email,
+          role: "admin" as const,
+        };
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.clienteId = user.id;
-        token.role = (user as { role?: "cliente" | "operador" }).role ?? "cliente";
+        token.role = (user as { role?: "cliente" | "operador" | "admin" }).role ?? "cliente";
         token.estacaoId = (user as { estacaoId?: string }).estacaoId;
         token.estacaoNome = (user as { estacaoNome?: string }).estacaoNome;
       }

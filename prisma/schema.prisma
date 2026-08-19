@@ -79,6 +79,22 @@ model OperadorEstacao {
 }
 
 // ---------------------------------------------------------------------------
+// Administrador KIPUPU — conta usada no painel /admin para cadastrar
+// estações parceiras reais e as respetivas contas de operador, sem precisar
+// de correr scripts no terminal.
+// ---------------------------------------------------------------------------
+
+model Admin {
+  id           String   @id @default(cuid())
+  nome         String
+  email        String   @unique
+  passwordHash String
+  ativo        Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
 // Cliente / autenticação
 // ---------------------------------------------------------------------------
 

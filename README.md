@@ -95,6 +95,49 @@ npx prisma migrate dev --name operador-estacao
 npm run prisma:seed
 ```
 
+## Painel administrativo (`/admin`) — cadastrar estações pela web
+
+Área reservada à equipa KIPUPU (não é linkada em lado nenhum do site
+público — acede-se diretamente pelo URL) para cadastrar estações parceiras
+reais sem passar pelo Terminal:
+
+- `/admin/login` — login da conta `Admin`.
+- `/admin/estacoes` — lista todas as estações cadastradas (localização,
+  operador associado, nº de lavagens feitas, estado ativa/inativa — com
+  botão para ativar/desativar).
+- `/admin/estacoes/nova` — formulário para criar uma estação nova: município,
+  distrito, nome, morada, coordenadas GPS, horário, capacidade, e os dados de
+  login do operador dessa estação. Ao gravar, mostra a password gerada
+  (ou a que escolheres) uma única vez — é a que entregas ao funcionário da
+  estação para ele entrar em `/estacao/login`.
+- Conta de demonstração (criada pelo seed): `admin@kipupu.ao` / `kipupu123`
+  — **muda esta password assim que possível** (por agora, criando outra conta
+  `Admin` diretamente na base de dados ou pedindo-me para adicionar essa
+  funcionalidade à interface).
+
+**Importante:** como o `schema.prisma` ganhou um modelo novo (`Admin`),
+depois de atualizares o código precisas de correr outra migração:
+
+```bash
+npx prisma migrate dev --name admin-panel
+npm run prisma:seed
+```
+
+## Adicionar uma estação parceira pelo Terminal (`npm run add-estacao`)
+
+Alternativa em linha de comandos ao painel `/admin` acima — mesma lógica,
+mas sem precisares de abrir o browser nem de fazer login. Útil se estiveres
+mais à-vontade no Terminal ou precisares de automatizar/repetir o processo.
+
+```bash
+npm run add-estacao
+```
+
+É um assistente interativo — vai perguntando os dados no terminal (nome da
+estação, morada, coordenadas GPS reais, horário, capacidade, e os dados de
+login do operador) e no final cria de uma vez a Estação e a conta
+`OperadorEstacao` correspondente, mostrando as credenciais geradas no fim.
+
 ## Como os passos do documento de fluxos mapeiam para o código
 
 | Passo (Processo 1) | Onde está |
@@ -133,16 +176,20 @@ npm run prisma:seed
 
 1. ~~Correr os 3 comandos de arranque local e confirmar que tudo compila.~~ ✓ confirmado.
 2. ~~Construir o painel da estação para ler o QR code e confirmar a lavagem.~~ ✓ feito (`/estacao/painel`).
-3. Substituir as coordenadas de exemplo das 6 estações de Nova Vida pelas
+3. ~~Substituir as coordenadas de exemplo das 6 estações de Nova Vida pelas
    coordenadas reais assim que os contratos com as estações parceiras forem
-   fechados.
+   fechados.~~ ✓ resolvido com `npm run add-estacao` (ver secção acima) —
+   cada estação real fica com as suas próprias coordenadas, independente dos
+   dados de exemplo do seed.
 4. Integrar a EMIS (Multicaixa Express) para referências reais e webhook de
    confirmação automática de pagamento.
 5. Ligar a WhatsApp Business API.
-6. Dar ao operador uma forma de criar/gerir as suas próprias contas
-   (`OperadorEstacao`) — hoje só existem via seed; provavelmente um painel de
-   administração da KIPUPU (fora do âmbito deste MVP) que cria a conta do
-   operador ao fechar contrato com cada estação parceira.
+6. ~~Dar à equipa KIPUPU uma forma de criar/gerir contas de operador
+   (`OperadorEstacao`) sem depender de mim.~~ ✓ feito — painel `/admin`
+   (interface gráfica) e `npm run add-estacao` (Terminal), à escolha. Falta
+   ainda: gestão de várias contas `Admin` pela própria interface (hoje só
+   existe a conta única criada pelo seed) e edição/remoção de estações já
+   criadas (por agora só é possível ativar/desativar).
 
 ## Deploy (GitHub + Vercel)
 
