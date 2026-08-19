@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/Button";
 import { LeitorQr } from "@/components/LeitorQr";
 
@@ -108,9 +109,14 @@ export default function PainelEstacaoPage() {
             <p className="text-xs text-white/70">{session?.user?.estacaoNome ?? "..."}</p>
           </div>
         </div>
-        <button onClick={() => signOut({ callbackUrl: "/estacao/login" })} className="text-sm text-white/70 hover:text-white">
-          Sair
-        </button>
+        <div className="flex items-center gap-4 text-sm">
+          <Link href="/estacao/estatisticas" className="text-white/80 hover:text-white">
+            Estatísticas
+          </Link>
+          <button onClick={() => signOut({ callbackUrl: "/estacao/login" })} className="text-white/70 hover:text-white">
+            Sair
+          </button>
+        </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 py-8">

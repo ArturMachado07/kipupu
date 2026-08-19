@@ -45,4 +45,9 @@ export const criarEstacaoAdminSchema = z.object({
   operadorNome: z.string().min(2, "Indica o nome do operador"),
   operadorEmail: z.string().email("Email do operador inválido"),
   operadorPassword: z.string().min(6, "Mínimo de 6 caracteres").optional().or(z.literal("")),
+  operadorWhatsapp: z
+    .string()
+    .regex(/^\+244\d{9}$/, "Usa o formato +244XXXXXXXXX")
+    .optional()
+    .or(z.literal("")),
 });

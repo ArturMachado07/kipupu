@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { criarEstacaoAdminSchema } from "@/lib/validation";
 import { gerarPasswordAleatoria } from "@/lib/senha";
+import { enviarWhatsAppCredenciaisOperador } from "@/lib/whatsapp";
 
 async function exigirAdmin() {
   const session = await getServerSession(authOptions);
@@ -66,6 +67,7 @@ export async function POST(req: Request) {
     operadorNome,
     operadorEmail,
     operadorPassword,
+    operadorWhatsapp,
   } = dados.data;
 
   const emailNormalizado = operadorEmail.toLowerCase().trim();
@@ -118,11 +120,27 @@ export async function POST(req: Request) {
     },
   });
 
+  // Se o admin preencheu o WhatsApp do operador, tenta enviar já as
+  // credenciais (real se WHATSAPP_API_TOKEN/WHATSAPP_PHONE_NUMBER_ID
+  // estiverem configurados; caso contrário fica só registado no log).
+  let whatsappEnviado = false;
+  if (operadorWhatsapp) {
+    const resultado = await enviarWhatsAppCredenciaisOperador({
+      numeroWhatsapp: operadorWhatsapp,
+      nomeOperador: operador.nome,
+      nomeEstacao: estacao.nome,
+      email: operador.email,
+      password: passwordFinal,
+    });
+    whatsappEnviado = resultado.enviado;
+  }
+
   return NextResponse.json({
     estacao: { id: estacao.id, nome: estacao.nome },
     operador: { id: operador.id, nome: operador.nome, email: operador.email },
     // Só devolvida nesta resposta, imediatamente após a criação — não fica
     // guardada em lado nenhum a partir daqui, tal como a password de qualquer conta.
     passwordGerada: passwordFinal,
+    whatsappEnviado,
   });
 }

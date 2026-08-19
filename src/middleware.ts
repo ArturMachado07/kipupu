@@ -16,7 +16,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
-  if (pathname.startsWith("/estacao/painel")) {
+  if (pathname.startsWith("/estacao/painel") || pathname.startsWith("/estacao/estatisticas")) {
     if (!token || token.role !== "operador") {
       const url = req.nextUrl.clone();
       url.pathname = "/estacao/login";
@@ -44,5 +44,11 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/cartao/:path*", "/estacao/painel/:path*", "/admin/estacoes/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/cartao/:path*",
+    "/estacao/painel/:path*",
+    "/estacao/estatisticas/:path*",
+    "/admin/estacoes/:path*",
+  ],
 };

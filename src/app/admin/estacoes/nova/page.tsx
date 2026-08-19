@@ -8,6 +8,7 @@ type Resultado = {
   estacao: { id: string; nome: string };
   operador: { id: string; nome: string; email: string };
   passwordGerada: string;
+  whatsappEnviado: boolean;
 };
 
 const campoClasse =
@@ -28,6 +29,7 @@ export default function NovaEstacaoPage() {
     operadorNome: "",
     operadorEmail: "",
     operadorPassword: "",
+    operadorWhatsapp: "",
   });
   const [erro, setErro] = useState<string | null>(null);
   const [aGuardar, setAGuardar] = useState(false);
@@ -65,6 +67,7 @@ export default function NovaEstacaoPage() {
         operadorNome: form.operadorNome,
         operadorEmail: form.operadorEmail,
         operadorPassword: form.operadorPassword,
+        operadorWhatsapp: form.operadorWhatsapp,
       }),
     });
 
@@ -91,7 +94,19 @@ export default function NovaEstacaoPage() {
             proximidade do Processo 2.
           </p>
 
-          <div className="bg-kipupu-gray100 rounded-md p-4 mt-6">
+          {resultado.whatsappEnviado ? (
+            <p className="bg-green-50 text-green-700 text-sm rounded-md p-3 mt-6">
+              ✓ Credenciais enviadas por WhatsApp ao operador.
+            </p>
+          ) : (
+            <p className="bg-kipupu-gray100 text-kipupu-gray900/70 text-sm rounded-md p-3 mt-6">
+              Não foi enviado nenhum WhatsApp automático (número não preenchido, ou a integração
+              WhatsApp ainda não está configurada em produção — ver README). Partilha as credenciais
+              abaixo manualmente por agora.
+            </p>
+          )}
+
+          <div className="bg-kipupu-gray100 rounded-md p-4 mt-3">
             <p className="text-sm font-bold text-kipupu-navy mb-2">
               Credenciais do operador — partilha com a estação agora, não voltam a aparecer aqui:
             </p>
@@ -265,6 +280,19 @@ export default function NovaEstacaoPage() {
           <input
             value={form.operadorPassword}
             onChange={(e) => atualizar("operadorPassword", e.target.value)}
+            className={campoClasse}
+          />
+
+          <label className={rotuloClasse}>
+            WhatsApp do operador{" "}
+            <span className="font-normal text-kipupu-gray900/50">
+              (opcional — se preenchido, tentamos enviar as credenciais automaticamente)
+            </span>
+          </label>
+          <input
+            value={form.operadorWhatsapp}
+            onChange={(e) => atualizar("operadorWhatsapp", e.target.value)}
+            placeholder="+244900000000"
             className={campoClasse}
           />
 

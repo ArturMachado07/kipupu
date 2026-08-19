@@ -86,6 +86,7 @@ webapp/
 
 - `/estacao/login` — login do operador (conta `OperadorEstacao`, ligada a uma `Estacao`).
 - `/estacao/painel` — lê o QR code pela câmara do telemóvel/computador (`components/LeitorQr.tsx`, usa `jsqr`, sem serviços pagos) ou aceita o código escrito à mão; mostra os dados do cliente e do pacote, valida se a subscrição está ativa, se o cartão não expirou, se o âmbito de uso permite lavar ali, e se ainda há lavagens disponíveis este mês; só depois de o operador confirmar é que a lavagem fica registada.
+- `/estacao/estatisticas` — dashboard simples de uso da estação: lavagens hoje/semana/mês/total, nº de clientes diferentes já atendidos, um gráfico (em CSS puro, sem biblioteca externa) das lavagens dos últimos 14 dias, e a lista das últimas lavagens. Mostra volume de utilização, não valores monetários — a estação não recebe pagamentos diretamente (a subscrição é paga à KIPUPU), a divisão de receita por estação ainda é uma decisão de negócio em aberto (ver "Decisões de produto já assumidas").
 - Conta de demonstração (criada pelo seed): `operador@kipupu.ao` / `estacao123`, ligada à primeira das 6 estações semeadas.
 
 **Importante:** como o `schema.prisma` ganhou um modelo novo (`OperadorEstacao`), depois de atualizares o código precisas de correr outra migração:
@@ -137,6 +138,51 @@ npm run add-estacao
 estação, morada, coordenadas GPS reais, horário, capacidade, e os dados de
 login do operador) e no final cria de uma vez a Estação e a conta
 `OperadorEstacao` correspondente, mostrando as credenciais geradas no fim.
+Diferença em relação ao painel `/admin`: este script **não** envia WhatsApp
+automaticamente — mostra sempre as credenciais no terminal para partilhares
+tu mesmo.
+
+## WhatsApp Business API — envio automático de credenciais
+
+Quando cadastras uma estação em `/admin/estacoes/nova` e preenches o
+WhatsApp do operador, a app tenta enviar-lhe logo as credenciais de acesso.
+O mesmo mecanismo (`src/lib/whatsapp.ts`) também é usado para avisar um
+cliente com o link do mapa assim que o pagamento é confirmado (Processo 2,
+Passo 2). Enquanto as duas variáveis abaixo não estiverem definidas, o envio
+fica em modo simulado — só regista a mensagem no log do servidor, nada
+falha.
+
+Para ativar o envio real:
+
+1. Cria uma conta em https://developers.facebook.com (Meta for Developers)
+   e uma App do tipo "Business".
+2. Dentro da App, adiciona o produto **WhatsApp**. A Meta atribui
+   automaticamente um número de teste gratuito.
+3. Em **WhatsApp → Início da API**, copia:
+   - o **Token de acesso temporário** (válido 24h — para testar já) ou,
+     melhor, gera um **token permanente** em **Configurações da Empresa →
+     Utilizadores do Sistema**, associando-o à app com a permissão
+     `whatsapp_business_messaging`.
+   - o **Phone Number ID** (não é o número de telefone em si, é um ID
+     numérico).
+4. Cola os dois valores no `.env` (e nas variáveis de ambiente da Vercel):
+   ```bash
+   WHATSAPP_API_TOKEN="o-teu-token"
+   WHATSAPP_PHONE_NUMBER_ID="o-teu-phone-number-id"
+   ```
+5. **Limitação do modo de teste:** enquanto a App não estiver validada pela
+   Meta ("App Review"), só consegues enviar mensagens para números que
+   adicionares manualmente em **WhatsApp → Início da API → Para → Gerir
+   lista de números de telefone** (até 5 números). Para validares o fluxo
+   completo com a tua equipa/estações reais antes da revisão da Meta ficar
+   pronta, adiciona os números delas aí primeiro.
+6. Depois de mudares o `.env`, reinicia o `npm run dev` (variáveis de
+   ambiente só são lidas no arranque). Em produção, muda as variáveis na
+   Vercel e faz Redeploy.
+
+Nenhum destes passos é urgente — enquanto não configurares isto, tudo
+continua a funcionar normalmente, só que as credenciais têm de ser
+partilhadas manualmente (é o que já estavas a fazer).
 
 ## Como os passos do documento de fluxos mapeiam para o código
 
@@ -183,7 +229,9 @@ login do operador) e no final cria de uma vez a Estação e a conta
    dados de exemplo do seed.
 4. Integrar a EMIS (Multicaixa Express) para referências reais e webhook de
    confirmação automática de pagamento.
-5. Ligar a WhatsApp Business API.
+5. ~~Ligar a WhatsApp Business API.~~ ✓ código pronto (ver secção "WhatsApp
+   Business API" acima) — falta só criares a conta na Meta e colares as duas
+   credenciais no `.env`/Vercel para o envio passar a ser real.
 6. ~~Dar à equipa KIPUPU uma forma de criar/gerir contas de operador
    (`OperadorEstacao`) sem depender de mim.~~ ✓ feito — painel `/admin`
    (interface gráfica) e `npm run add-estacao` (Terminal), à escolha. Falta
