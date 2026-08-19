@@ -43,7 +43,7 @@ Supabase).
 
 ```bash
 cd webapp
-cp .env.example .env          # cola aqui a POSTGRES_PRISMA_URL e a POSTGRES_URL_NON_POOLING
+cp .env.example .env          # cola aqui a DATABASE_URL e a DATABASE_URL_UNPOOLED
                                 # (ou corre `vercel env pull .env` depois de ligares o projeto à Vercel)
 npm install
 npx prisma migrate dev --name init
@@ -190,10 +190,12 @@ git push -u origin main
 
 ### 3. Ligar uma base de dados Postgres
 
-No projeto, na aba **Storage** → **Create Database** → **Postgres**, segue o
-assistente e liga-a ao projeto. A Vercel injeta automaticamente
-`POSTGRES_PRISMA_URL` e `POSTGRES_URL_NON_POOLING` (entre outras) nas
-variáveis de ambiente — é exatamente o que o `prisma/schema.prisma` já espera.
+No projeto, na aba **Storage** → **Create Database** → escolhe **Neon**
+(Postgres serverless — é a integração que hoje faz o papel do antigo "Vercel
+Postgres") e segue o assistente. Depois de criada, clica em **Connect to
+Project** para a ligar ao projeto `kipupu`. A Vercel injeta automaticamente
+`DATABASE_URL` e `DATABASE_URL_UNPOOLED` (entre outras) nas variáveis de
+ambiente — é exatamente o que o `prisma/schema.prisma` já espera.
 
 ### 4. Criar as tabelas e popular a base de dados
 
@@ -215,4 +217,3 @@ npm run prisma:seed
 
 A partir daqui, qualquer `git push` para `main` faz deploy automático — é
 assim que vais publicar todas as próximas alterações.
-# kipupu
