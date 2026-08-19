@@ -215,3 +215,4 @@ npm run prisma:seed
 
 A partir daqui, qualquer `git push` para `main` faz deploy automático — é
 assim que vais publicar todas as próximas alterações.
+# kipupu
