@@ -51,7 +51,22 @@ export default function PainelEstacaoPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ codigo: codigo.trim() }),
       });
-      setValidacao(await resp.json());
+
+      // A sessão de operador é partilhada com o resto do site (mesmo browser).
+      // Se entretanto tiver sido feito login como cliente ou admin noutro
+      // separador, este pedido chega sem sessão de operador válida — mostra
+      // uma mensagem clara em vez de ficar em branco.
+      if (resp.status === 401) {
+        setValidacao({
+          valido: false,
+          motivo:
+            "A tua sessão de operador expirou ou foi substituída (por ex. login como cliente noutro separador). Sai e volta a entrar em /estacao/login.",
+        });
+        return;
+      }
+
+      const dados = await resp.json();
+      setValidacao({ motivo: "Não foi possível validar o cartão.", ...dados });
     } catch {
       setValidacao({ valido: false, motivo: "Erro de rede ao validar o cartão." });
     } finally {
@@ -131,9 +146,18 @@ export default function PainelEstacaoPage() {
               <p className="text-sm text-kipupu-gray900/70 mt-1">Cliente: {validacao.cliente.nome}</p>
             )}
             <p className="text-sm text-kipupu-gray900/80 mt-2">{validacao.motivo}</p>
-            <Button onClick={novaLeitura} className="w-full mt-6">
-              Nova leitura
-            </Button>
+            {validacao.motivo?.includes("sessão de operador") ? (
+              <Button
+                onClick={() => signOut({ callbackUrl: "/estacao/login" })}
+                className="w-full mt-6"
+              >
+                Sair e voltar a entrar
+              </Button>
+            ) : (
+              <Button onClick={novaLeitura} className="w-full mt-6">
+                Nova leitura
+              </Button>
+            )}
           </section>
         )}
 
